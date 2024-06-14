@@ -1,0 +1,15 @@
+[General]
+windowWidth=1280
+windowHeight=720
+gameWidth=320
+gameHeight=180
+
+[Keybinds]
+forward=K_w
+backward=K_s
+left=K_a
+right=K_d
+jump=K_SPACE
+crouch=K_LCTRL
+ctrlmode = K_LCTRL
+interact=K_f
