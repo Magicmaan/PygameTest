@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 from Program import Program
 from TextureHandler import TextureHandler
 from CollisionHandler import *
@@ -15,13 +16,20 @@ class Entity(pygame.sprite.Sprite):
         self.position = position
         self.identifier = "entity"
         self.state = "idle"
-        self.lastInput = ""
         self.flip = False
         self.isAlive = True
         
+        self.input = ""
+        self.lastInput = self.input
+
         self.gravity = 10
+
         self.onGround = False
+        self.onGroundTimer = 0
+
         self.isMoving = False
+        self.isMovingTimer = 0
+
         self.velocity = pygame.math.Vector2(0,0)
         self.maxVelocity = pygame.math.Vector2(1.5,50)
 
@@ -35,6 +43,11 @@ class Entity(pygame.sprite.Sprite):
         #texture setup
         self.texturePath = texturePath
         self.image = Texture.texture(self.texturePath,0)
+
+        self.useOutline = True
+        self.imageOutline = False
+        self.outlineColour = (255,0,255)
+
         self.rect = pygame.Rect(self.position.x, self.position.y, self.image.get_width(), self.image.get_height())
         self.attributes = attributes
 
@@ -69,12 +82,27 @@ class Entity(pygame.sprite.Sprite):
         
         #check and update collisions
         collideUpdate(self,game.floorColliders,game.tileMap)
-        
+
+          
+          
         self.position += self.velocity
         self.rect.update(self.position.x, self.position.y, self.rect.width, self.rect.height)
 
-        self.animationUpdate()
+        if not self.onGround:
+            self.onGroundTimer += 1
+        else:
+            self.onGroundTimer = 0      
+        
+        if not self.isMoving:
+            self.isMovingTimer += 1
+        else:
+            self.isMovingTimer = 0   
+        
+        if self.isMovingTimer > game.afkTimer:
+            self.state = "afk"
 
+
+        self.animationUpdate()
         self.image = pygame.transform.flip(self.image,self.flip,False)
 
 
@@ -84,35 +112,56 @@ class Entity(pygame.sprite.Sprite):
         if not self.hasAnimation: #if no animations, return from function
             return
 
+        if not self.state in self.AnimationSlides.keys():
+            state = "idle"
+        else:
+            state = self.state
+            
+
         #gets last entry in animationSlides state, which is FPS value
-        animationFPS = self.AnimationSlides[self.state][-1]
+        animationFPS = self.AnimationSlides[state][-1]
         #checks remainder againsts game tick, if so increment animation
         if game.tick % animationFPS == 0:
             self.animationPos += 1
 
 
         #animation overflow check
-        if self.animationPos >= len(self.AnimationSlides[self.state])-1:
+        if self.animationPos >= len(self.AnimationSlides[state])-1:
             self.animationPos = 0
         
         #getSprite()
-        #from objects animation slides, takes in the self.state values and animation position
+        #from objects animation slides, takes in thestate values and animation position
         #this returns a number corresponding to position on spritesheet for getSprite()
         
         #get spritesheet pos
-        pos = self.AnimationSlides[self.state][self.animationPos]
-        filepath = "player/spritesheet"
+        pos = self.AnimationSlides[state][self.animationPos]
         self.image = Texture.texture(self.texturePath,pos)
         
-            
         
     
     def draw(self,surface):
-        tx = self.position.copy()
-        tx.y = round(tx.y,0)
+        #obj rect doesn't always match sprite
+        #must adjust image to be centered inside rect
+        correctedPos = pygame.Vector2(self.rect.centerx - self.image.get_width()/2, self.rect.centery - self.image.get_height()/2)
+        correctedPos.y = round(correctedPos.y,0)
 
         if self.isAlive:
-            surface.blit(self.image, round(tx + game.camera,0))
+            if self.useOutline:
+                self.drawOutline(surface,correctedPos.copy())
+
+            surface.blit(self.image, round(correctedPos + game.camera,0))
+
+    def drawOutline(self, surface, pos):
+        #convert sprite to mask then back to surface to produce monochrome outline
+        image = pygame.mask.from_surface(self.image).to_surface()
+        image.fill(self.outlineColour,special_flags=pygame.BLEND_RGBA_MULT)
+        image.set_colorkey((0,0,0))
+        # Blit the BW outline, offset around main player
+        surface.blit(image, (round(pos.x-1 + game.camera.x), round(pos.y + game.camera.y))) #left
+        surface.blit(image, (round(pos.x+1 + game.camera.x), round(pos.y + game.camera.y))) #right
+        surface.blit(image, (round(pos.x-1 + game.camera.x), round(pos.y-1 + game.camera.y))) #up
+        surface.blit(image, (round(pos.x-1 + game.camera.x), round(pos.y+1 + game.camera.y))) #down
+
 
 
         

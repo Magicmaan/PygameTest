@@ -38,7 +38,7 @@ class InputHandler:
         #gets from keymap
         if not self.keymap:
             self.pollInput()
-
+        
         return self.keymap[getattr(pygame, key)]
     
             

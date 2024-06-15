@@ -25,10 +25,10 @@ def main():
         #game.floorColliders.add(wall)
     
     wall2 = Object(pygame.math.Vector2(50,74),wallText,0,{})
-    #game.allSprites.add(wall2)
-    #game.floorColliders.add(wall2)
+    game.allSprites.add(wall2)
+    game.floorColliders.add(wall2)
 
-    slope22 = Object(pygame.math.Vector2(98,74),"wall22",0,{"angle" : 22, "flip" : True})
+    slope22 = Object(pygame.math.Vector2(98,74),"wall",0,{"angle" : 22, "flip" : True})
     slope22.identifier = "object 22d"
     #game.allSprites.add(slope22)
     #game.floorColliders.add(slope22)
@@ -45,7 +45,7 @@ def main():
         game.draw(player)
         
         
-        game.camera = round(game.camera.smoothstep(pygame.math.Vector2(-player.position.x + game.screen.get_width()/2,game.camera.y),0.1),2)
+        game.camera = round(game.camera.smoothstep(pygame.math.Vector2(-player.position.x + game.screen.get_width()/2,game.camera.y),0.15),2)
         game.camera.y = 0
         game.dt = game.clock.tick(game.framerate) / 1000    
         

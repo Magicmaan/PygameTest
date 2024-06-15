@@ -1,8 +1,8 @@
 from Entity import Entity
-from Texture import Texture
 from Program import Program
 from InputHandler import InputHandler
 import random
+import numpy
 
 gInput = InputHandler()
 
@@ -22,26 +22,27 @@ class Player(Entity):
             "run": (4,5,6,7,8),
             "jump": (8,1),
             "crouch" : (9,1),
+            "afk" : (8,9,10)
         }
         
         attributes = {
             "animations" : animations,
             "identifier" : "player",
+            "rect" : (10,16),
+            #"maxVelocity" : pygame.Vector2(100,20)
         }
 
         Entity.__init__(self,position,texturePath,attributes)
 
        
-        self.jumpHeight = -5
-        self.accel = 1
+        self.jumpHeight = -2.5
+        self.jumpCoyote = 10
+
+        self.accel = 2.5
         self.friction = 10
 
+
         
-        
-        
-    
-        
-    
     def Position(self):
         if abs(self.velocity.x) > (self.maxVelocity.x): #max velocity speed cap
             self.velocity.x = math.copysign(self.maxVelocity.x, self.velocity.x)
@@ -65,23 +66,37 @@ class Player(Entity):
     def update(self):
         self.isMoving = False
         self.state = "idle"
-        
-        if gInput.jump() and self.onGround:
+        self.lastInput = self.input
+
+        #if on ground, or x number of frame after being on ground
+        if gInput.jump() and (self.onGround or self.onGroundTimer < self.jumpCoyote):
             self.onGround = False
             self.velocity.y = self.jumpHeight 
-            self.lastInput = "jump"
             self.state = "jump"
+            self.input = "jump"
             
         if gInput.left() and not self.collisions["left"]:
             self.velocity.x -= self.accel * game.dt
             self.isMoving = True
             self.flip = True
             self.state = "run"
+            self.input = "left"
+            if self.lastInput == "right":
+                self.velocity.x = -abs(self.velocity.x / 1.5)
+
         if gInput.right() and not self.collisions["right"]:
             self.velocity.x += self.accel * game.dt
             self.isMoving = True
             self.flip = False
             self.state = "run"
+            self.input = "right"
+            if self.lastInput == "left":
+                self.velocity.x = abs(self.velocity.x / 1.5)
+        
+        if gInput.key("K_g"):
+            game.particles.add(pygame.Vector2(self.rect.center),"leaf",count=50)
+            
+
         
         if gInput.L_CTRL():
             self.state = "crouch"
@@ -110,18 +125,19 @@ class Player(Entity):
         pArgs = {
             "CycleImg" : True,
             "UseVelocity" : True,
-            "Acceleration" : pygame.Vector2(random.uniform(-5,5) + veloffsetX,random.uniform(5,25)),
+            "Acceleration" : pygame.Vector2(random.uniform(-2.5,2.5) + veloffsetX,random.uniform(10,50)),
             "CycleImgFrequency" : 50,
             "texture" : 0,
             "randomTex" : True,
-            "randomTexBounds" : (0,3),
+            "randomTexBounds" : (4,5),
             "spread" : (5,10),
-            "lifespan" : random.randint(25,80),
+            "lifespan" : random.randint(100,300),
+            "canFlip" : True
         }
 
-        if self.velocity.x == 0:
-            if randomNum < 2: game.particles.add(midPos,"default",pArgs)
-        else:
-            if randomNum < 8: game.particles.add(midPos,"default",pArgs)
+        #if self.velocity.x == 0:
+        #    if randomNum < 50: game.particles.add(midPos,"leaf")
+        #else:
+        #    if randomNum < 80: game.particles.add(midPos,"leaf",{"Acceleration":pygame.Vector2(veloffsetX,0)})
 
 

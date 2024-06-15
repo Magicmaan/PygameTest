@@ -64,12 +64,15 @@ def collideResolve(spr,sprRect,objRect):
             spr.velocity.y = 0
     
     elif colPoint(sprRect.midtop) or colPoint((sprRect.left + 1, sprRect.top)) or colPoint((sprRect.right - 1, sprRect.top)):
+        print("Top Hit")
         spr.collisions["up"] = True
         spr.position.y = objRect.bottom  # Adjust the position to be exactly below the collider
-        spr.velocity.y = 0  # Stop vertical velocity
+        if spr.velocity.y < 0:
+            spr.velocity.y = abs(spr.velocity.y)
     
     # Check horizontal collisions (left and right)
     elif colPoint(sprRect.midleft) or colPoint((sprRect.left, sprRect.top + 2)) or colPoint((sprRect.left, sprRect.bottom - 4)):
+        print("Left Hit")
         spr.collisions["left"] = True
         spr.position.x = objRect.right
         if spr.velocity.x < 0:
@@ -91,8 +94,6 @@ def collideTest(rect,objs):
     for obj in objs:
         if rect.colliderect(obj.rect):
             objectCollisions.append(obj)
-    
-    
 
     return objectCollisions
 
@@ -106,14 +107,15 @@ def collideUpdate(spr,collideGroup,tileMap):
 
     tileCollisions = tileMap.getTileAround(futureRect)
     if tileCollisions:
-        for tile in tileCollisions:
-            collideResolve(spr,futureRect,tile)
+        #print(len(tileCollisions))
+        for tileRect in tileCollisions:
+            collideResolve(spr,futureRect,tileRect)
 
-    #objectCollisions = collideTest(futureRect,collideGroup)
+    objectCollisions = collideTest(futureRect,collideGroup)
     #if their are collisions
-    #if objectCollisions:
-    #    for obj in objectCollisions:
-    #        objectCollideResolve(spr,futureRect,obj)
+    if objectCollisions:
+        for obj in objectCollisions:
+            objectCollideResolve(spr,futureRect,obj)
 
             
             

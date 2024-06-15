@@ -13,6 +13,7 @@ class Object(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(pygame.sprite.Sprite)
         
         self.position = position
+        self.state = "solid"
         self.identifier = "object"
         self.attributes = attributes
         self.flip = False

@@ -7,16 +7,16 @@ from InputHandler import InputHandler
 gInput = InputHandler()
 
 class Debugger:
-    def __init__(self,gameObject,surface,enableDebug = False,enableFPS = True,enableObjectDebug = False):
+    def __init__(self,gameObject,surface, enableDebug = False, enableFPS = True, enableObjectDebug = False):
         self.game = gameObject
         self.surface = surface
         self.lineoffset = 4
         
-        self.enableDebug = enableDebug
+        self.enableDebug = True
         self.enableFPS = enableFPS
         self.enableObjectDebug = enableObjectDebug
-        self.showcollisions = True
-        self.tileGrid = True
+        self.showcollisions = False
+        self.tileGrid = False
 
         self.toggleTimer = 0
         
@@ -27,9 +27,12 @@ class Debugger:
                      self.surface,[0, 
                                    0])
         
-        TextGUI.write(str(self.game.dt * 1000),
+        TextGUI.write(str(len(self.game.particles.particles)),
                      self.surface,[0, 
                                    20])
+        
+        if int(clock.get_fps()  ) < 60:
+            print("FPS hit 60 at particle count: " + str(len(self.game.particles.particles)))
     
     
     def addTarget(self,target,debugGroup):
@@ -72,7 +75,6 @@ class Debugger:
             pygame.draw.line(self.surface,"red",(0,(y *tileMap.tileSize  *yMult) +offsetY),(2000,(y *tileMap.tileSize  *yMult) +offsetY))
     
     def printObjects(self,outputRes,nativeRes,debugGroup):
-        
         xMult = outputRes[0] / nativeRes[0]
         yMult = outputRes[1] / nativeRes[1]
         
@@ -93,7 +95,7 @@ class Debugger:
             posX += self.game.camera.x
             posY += self.game.camera.y
 
-            TextGUI.write(obj.identifier,
+            TextGUI.write(obj.identifier + " " + obj.state,
                          self.surface,[posX  * xMult, 
                          (posY + obj.rect.height) * yMult])
             n=0

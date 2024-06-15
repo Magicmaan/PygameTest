@@ -10,7 +10,7 @@ class TileMap:
             [1,1,1,1],
             [1],
             [1],
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         ]
         self.texturemap = {
             0 : False,
@@ -37,46 +37,46 @@ class TileMap:
 
     def getTile(self,x,y):
         #get tile at exact location in tilemap
+        #print(str(y) + " " + str(x))
 
-        #Tile = 
 
-        return self.tilemap[y][x]
+        tile = 0
+        if y < 0 or x < 0:
+             return tile
+
+        if y <= len(self.tilemap)-1:
+            if x <= len(self.tilemap[y])-1:
+                
+                tile = self.tilemap[y][x]
+
+        return tile
 
 
     def getTileAround(self,rect,range=1):
         #centre of sprite
         spritePos = [rect.centerx , rect.centery]
+        #convert to tile grid
         onGridPos = [spritePos[0] // self.tileSize , spritePos[1] // self.tileSize]
 
         #print("player pos: " + str(onGridPos))
         tilesAround = []
+        #for direction vectors around player pos
         for dx,dy in self.directions:
+            #get new grid position
             newGridPos = [onGridPos[0] + dx , onGridPos[1] + dy]
-            #print("offset pos: " + str(newGridPos))
-
-            if newGridPos[1] <= len(self.tilemap): #valid y position
-                #print(self.tilemap[newGridPos[1]])
-                if newGridPos[0] <= len(self.tilemap[newGridPos[1]]): #valid x position
-                    #if self.tilemap[newGridPos[1]][newGridPos[0]] != 0: #if not air
-                        newSpritePos = [newGridPos[0] * self.tileSize , newGridPos[1] * self.tileSize]
-
-                        rect = pygame.Rect(newSpritePos[0]-24, newSpritePos[1], newSpritePos[0]+8, newSpritePos[1]+8)
-                        tilesAround.append(rect)
-                
-
             
 
+            if self.getTile(newGridPos[0],newGridPos[1]) != 0:
+                #if self.tilemap[newGridPos[1]][newGridPos[0]] != 0: #if not air
+                newSpritePos = [newGridPos[0] * self.tileSize , newGridPos[1] * self.tileSize]
+
+                rect = pygame.Rect(newSpritePos[0], newSpritePos[1], 16, 16)
+                tilesAround.append(rect)
+        
+
         return tilesAround
-
-
-        #get position
-        #expand rect to include tiles around
-        #sample around to get x,y
-
-        #for tiles: TileList.append(getTile(x,y))
-
-        #return list of tiles around
-        pass
+        #return list of tiles around rect sprite
+        
 
     def draw(self,surface):
 

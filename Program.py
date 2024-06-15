@@ -8,6 +8,7 @@ from TextureHandler import TextureHandler
 from ParticleHandler import ParticleHandler
 from Particles import *
 from TileMap import TileMap
+from BackgroundHandler import BackgroundHandler
 
 
 gInput = InputHandler() #initialise input handler
@@ -41,6 +42,7 @@ class Program:
 
         pygame.key.set_repeat(500,500)
 
+        self.afkTimer = 36000
         self.clock = pygame.time.Clock() 
         self.running = True
         self.dt = 0
@@ -66,8 +68,8 @@ class Program:
             l.set_colorkey((0,0,0))
     
         
-
-
+        self.font = TextGUI.initFont()
+        self.background = BackgroundHandler(self)
         self.textures = TextureHandler()
         self.tileMap = TileMap(self)
         self.particles = ParticleHandler(self)
@@ -94,12 +96,19 @@ class Program:
         for i,layer in self.renderLayers.items():
             layer.fill((0,0,0))
         
+
+        self.background.draw(self.renderLayers["Background"])
         self.drawGroup(self.allSprites,self.renderLayers["Foreground"])
 
-        self.tileMap.draw(self.screen)
+        self.tileMap.draw(self.renderLayers["Foreground"])
         self.particles.draw(self.renderLayers["Particles"])
+
+        self.screen.blit(self.renderLayers["Background"],(0,0))
         self.screen.blit(self.renderLayers["Foreground"],(0,0))
         self.screen.blit(self.renderLayers["Particles"],(0,0))
+
+        TextGUI.writeNew("0123456789 .,/?;:!",self.screen,[-20,20],self.font)
+
         frame = pygame.transform.scale(self.screen, self.Outputresolution) #output to frame and draw to screen
         self.screenOutput.blit(frame, frame.get_rect())
         
