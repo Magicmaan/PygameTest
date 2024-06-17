@@ -32,7 +32,7 @@ def main():
     slope22.identifier = "object 22d"
     #game.allSprites.add(slope22)
     #game.floorColliders.add(slope22)
-
+    gameTime = 1
     
     while game.running:
         for event in pygame.event.get():
@@ -42,12 +42,20 @@ def main():
         
 
         game.update()
-        game.draw(player)
+        game.draw()
         
-        
+        k = pygame.key.get_pressed()
+        if k[pygame.K_ESCAPE]:
+            game.TimeMult = 0.25
+        else:
+            game.TimeMult = 1
+
         game.camera = round(game.camera.smoothstep(pygame.math.Vector2(-player.position.x + game.screen.get_width()/2,game.camera.y),0.15),2)
         game.camera.y = 0
-        game.dt = game.clock.tick(game.framerate) / 1000    
+        game.dt = (game.clock.tick(game.framerate) / 1000) * game.TimeMult  
+
+       
+        
         
         game.tick=game.tick+1
         

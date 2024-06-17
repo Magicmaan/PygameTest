@@ -26,12 +26,14 @@ class Entity(pygame.sprite.Sprite):
 
         self.onGround = False
         self.onGroundTimer = 0
+        self.friction = 10
 
+        self.canMove = pygame.Vector2(1,1)
         self.isMoving = False
         self.isMovingTimer = 0
 
         self.velocity = pygame.math.Vector2(0,0)
-        self.maxVelocity = pygame.math.Vector2(1.5,50)
+        self.maxVelocity = pygame.math.Vector2(1.5,10)
 
         #collisions setup
         self.collisions = {}
@@ -74,6 +76,22 @@ class Entity(pygame.sprite.Sprite):
         
     
     def update(self):
+        if abs(self.velocity.x) > (self.maxVelocity.x * game.TimeMult): #max velocity speed cap
+            self.velocity.x = math.copysign(self.maxVelocity.x * game.TimeMult, self.velocity.x)
+
+        if not self.isMoving: #slow down if not moving
+            self.velocity.x *= (1- self.friction * game.dt)
+            if math.isclose(self.velocity.x, 0,abs_tol=0.05):
+                self.velocity.x = 0
+        
+        if not self.onGround: #gravity if not on ground
+            self.velocity.y += (self.gravity * game.dt) / game.TimeMult
+
+        #vertical speed cap
+        self.velocity.y = min(self.maxVelocity.y * game.TimeMult, self.velocity.y) 
+
+
+
         self.onGround = False
         self.collisions["up"] = False
         self.collisions["down"] = False
@@ -82,6 +100,7 @@ class Entity(pygame.sprite.Sprite):
         
         #check and update collisions
         collideUpdate(self,game.floorColliders,game.tileMap)
+
 
           
           
@@ -92,7 +111,6 @@ class Entity(pygame.sprite.Sprite):
             self.onGroundTimer += 1
         else:
             self.onGroundTimer = 0      
-        
         if not self.isMoving:
             self.isMovingTimer += 1
         else:
@@ -121,7 +139,7 @@ class Entity(pygame.sprite.Sprite):
         #gets last entry in animationSlides state, which is FPS value
         animationFPS = self.AnimationSlides[state][-1]
         #checks remainder againsts game tick, if so increment animation
-        if game.tick % animationFPS == 0:
+        if game.tick % (animationFPS // game.TimeMult) == 0:
             self.animationPos += 1
 
 

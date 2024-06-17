@@ -38,15 +38,16 @@ class Player(Entity):
         self.jumpHeight = -2.5
         self.jumpCoyote = 10
 
-        self.accel = 2.5
+        self.accel = 5
         self.friction = 10
 
 
         
     def Position(self):
+        return
         if abs(self.velocity.x) > (self.maxVelocity.x): #max velocity speed cap
             self.velocity.x = math.copysign(self.maxVelocity.x, self.velocity.x)
-
+        
 
         if not self.isMoving: #slow down if not moving
             self.velocity.x = self.velocity.x * (1-self.friction * game.dt)
@@ -68,14 +69,32 @@ class Player(Entity):
         self.state = "idle"
         self.lastInput = self.input
 
+        if gInput.crouch():
+            self.friction = 5
+            self.jumpHeight = -3
+            self.accel = 1
+            self.maxVelocity.update(0.5,5)
+            self.state = "crouch"
+            #game.particles.add(pygame.Vector2(self.rect.center),"leaf",count=50)
+        else:
+            self.jumpHeight = -2.5
+            self.friction = 10
+            self.accel = 5
+            self.maxVelocity.update(1.5,10)
+
+
         #if on ground, or x number of frame after being on ground
-        if gInput.jump() and (self.onGround or self.onGroundTimer < self.jumpCoyote):
+        if gInput.jump() and self.velocity.y >= 0 and ((self.onGround or self.onGroundTimer < self.jumpCoyote)):
             self.onGround = False
-            self.velocity.y = self.jumpHeight 
+            self.velocity.y = self.jumpHeight
+            if gInput.crouch():
+                self.velocity.y *= 1.5
             self.state = "jump"
             self.input = "jump"
-            
-        if gInput.left() and not self.collisions["left"]:
+            game.particles.add(pygame.Vector2(self.rect.center),"leaf",count=10)
+
+
+        if gInput.left() and self.canMove[0] and not self.collisions["left"]:
             self.velocity.x -= self.accel * game.dt
             self.isMoving = True
             self.flip = True
@@ -84,7 +103,7 @@ class Player(Entity):
             if self.lastInput == "right":
                 self.velocity.x = -abs(self.velocity.x / 1.5)
 
-        if gInput.right() and not self.collisions["right"]:
+        if gInput.right() and self.canMove[0] and not self.collisions["right"]:
             self.velocity.x += self.accel * game.dt
             self.isMoving = True
             self.flip = False
@@ -93,13 +112,11 @@ class Player(Entity):
             if self.lastInput == "left":
                 self.velocity.x = abs(self.velocity.x / 1.5)
         
-        if gInput.key("K_g"):
-            game.particles.add(pygame.Vector2(self.rect.center),"leaf",count=50)
-            
 
         
-        if gInput.L_CTRL():
-            self.state = "crouch"
+
+
+            
 
         
         

@@ -9,6 +9,7 @@ from ParticleHandler import ParticleHandler
 from Particles import *
 from TileMap import TileMap
 from BackgroundHandler import BackgroundHandler
+from GUI import GUIHandler
 
 
 gInput = InputHandler() #initialise input handler
@@ -46,6 +47,7 @@ class Program:
         self.clock = pygame.time.Clock() 
         self.running = True
         self.dt = 0
+        self.TimeMult = 1
         self.tick = 0
         self.camera = pygame.Vector2(0,0)
         
@@ -85,11 +87,11 @@ class Program:
         self.allObjects.update()
         self.allSprites.update()
 
-        self.particles.update()
+        
 
         
         
-    def draw(self,p):
+    def draw(self):
         self.screen.fill("gray")
 
 

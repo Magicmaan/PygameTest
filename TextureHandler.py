@@ -15,9 +15,11 @@ class TextureHandler:
         if self._initialized:
             return
         self._initialized = True
-        
         self.textureMap = {}
         self.spritesheet = {}
+
+        self.blank = pygame.Surface((16,16))
+        self.blank.set_colorkey((0,0,0))
 
     def checkFilepath(self,filepath):
         if os.path.isfile(filepath): #if valid path, return

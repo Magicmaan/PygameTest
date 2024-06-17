@@ -13,3 +13,4 @@ jump=K_SPACE
 crouch=K_LCTRL
 ctrlmode = K_LCTRL
 interact=K_f
+escape=K_ESCAPE

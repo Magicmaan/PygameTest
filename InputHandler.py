@@ -27,9 +27,6 @@ class InputHandler:
     def getMouse(self):
         #to be added
         pass
-    
-    
-
 
     def key(self,key):
         #get individual key input
@@ -38,7 +35,7 @@ class InputHandler:
         #gets from keymap
         if not self.keymap:
             self.pollInput()
-        
+
         return self.keymap[getattr(pygame, key)]
     
             
@@ -56,19 +53,13 @@ class InputHandler:
         self.mods = pygame.key.get_mods()
         
         
-    def L_CTRL(self):
-        if self.mods == pygame.KMOD_LCTRL:
-            return True
-        return False
+    def CTRL(self):
+        return self.keymap[getattr(pygame, "K_LCTRL")] or self.keymap[getattr(pygame, "K_RCTRL")]
     
-    def L_SHIFT(self):
-        if self.mods == pygame.KMOD_LSHIFT:
-            return True
-        return False
+    def SHIFT(self):
+        return self.keymap[getattr(pygame, "K_LSHIFT")] or self.keymap[getattr(pygame, "K_RSHIFT")]
     
-    def L_ALT(self):
-        if self.mods == pygame.K_LALT:
-            return True
-        return False
+    def ALT(self):
+        return self.keymap[getattr(pygame, "K_LALT")] or self.keymap[getattr(pygame, "K_RALT")]
         
     

@@ -1,21 +1,43 @@
 import pygame
 import TextGUI
+import random
+
+
 
 class TileMap:
     def __init__(self,game, tileSize = 16):
         self.tileSize = tileSize
         self.tilemap = [
-            [1],
-            [1],
-            [1,1,1,1],
-            [1],
-            [1],
+            [1,0],
+            [1,0],
+            [1,1,1,1,3],
+            [1,0],
+            [1,0],
             [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         ]
         self.texturemap = {
-            0 : False,
-            1 : pygame.image.load("resources/wall.png").convert()
+            0 : game.textures.blank,
+            1 : game.textures.texture("wall",0),
+
+            2 : game.textures.texture("wall",1),
+            3 : game.textures.texture("wall",2),
+            4 : pygame.transform.flip(game.textures.texture("wall",2),True,False),
         }
+
+        #tell tilemap to draw these around main tile
+        #top, bottom, left, right
+        self.toConnectTiles = {
+            1 : (2, 0, 4, 3)
+        }
+
+        self.transparentTiles = {
+            0 : True,
+            2 : True,
+            3 : True,
+            4 : True,
+        }
+
+        
         self.directions = [
             (-1,-1),( 0,-1),( 1,-1),
             (-1, 0)        ,( 1, 0),
@@ -24,6 +46,7 @@ class TileMap:
 
         self.game = game
 
+        self.randomSeed = random.random()
         self.renderview = pygame.Rect(0,0,20,20)
     
 
@@ -65,8 +88,8 @@ class TileMap:
             #get new grid position
             newGridPos = [onGridPos[0] + dx , onGridPos[1] + dy]
             
-
-            if self.getTile(newGridPos[0],newGridPos[1]) != 0:
+            #transparent tile check
+            if not self.getTile(newGridPos[0],newGridPos[1]) in self.transparentTiles:
                 #if self.tilemap[newGridPos[1]][newGridPos[0]] != 0: #if not air
                 newSpritePos = [newGridPos[0] * self.tileSize , newGridPos[1] * self.tileSize]
 
@@ -92,17 +115,45 @@ class TileMap:
 
         #print(str(self.renderview.x) + " " + str(self.renderview.width) + "  " + str(self.renderview.y) + " " + str(self.renderview.height))
         for y in range(self.renderview.y,self.renderview.height):
-            
             if y > len(self.tilemap)-1:
                 break
 
             for x in range(self.renderview.x,self.renderview.width):
                 if x > len(self.tilemap[y])-1:
                     break
-                if self.tilemap[y][x] in self.texturemap:
+
+                if self.tilemap[y][x] in self.texturemap and not self.tilemap[y][x] in self.transparentTiles:
                     tileImg = self.texturemap[self.tilemap[y][x]]
-                
+                else:
+                    tileImg = False
+
                 if tileImg:
                     surface.blit(tileImg, ((x*self.tileSize) + int(self.game.camera.x),(y*self.tileSize) + int(self.game.camera.y)))
-                    TextGUI.write((str(x) + " " + str(y)),surface,[(x*self.tileSize) + int(self.game.camera.x),(y*self.tileSize) + int(self.game.camera.y)])
+
+                    #tilemap connect around logic
+                    #if in toConnectTiles, will place the connector tiles above,below,left,right
+                    if self.tilemap[y][x] in self.toConnectTiles:
+                        if self.getTile(x,y-1) in self.transparentTiles:
+                            surface.blit(self.texturemap[self.toConnectTiles[self.tilemap[y][x]][0]], ((x*self.tileSize) + int(self.game.camera.x),((y-1)*self.tileSize) + int(self.game.camera.y)))
+                        if self.getTile(x,y+1) in self.transparentTiles:
+                            surface.blit(self.texturemap[self.toConnectTiles[self.tilemap[y][x]][1]], ((x+1*self.tileSize) + int(self.game.camera.x),((y)*self.tileSize) + int(self.game.camera.y)))
+                        if self.getTile(x+1,y) in self.transparentTiles:
+                            surface.blit(self.texturemap[self.toConnectTiles[self.tilemap[y][x]][3]], ((x+1*self.tileSize) + int(self.game.camera.x),((y)*self.tileSize) + int(self.game.camera.y)))
+                        if self.getTile(x-1,y) in self.transparentTiles:
+                            surface.blit(self.texturemap[self.toConnectTiles[self.tilemap[y][x]][2]], ((x-1*self.tileSize) + int(self.game.camera.x),((y)*self.tileSize) + int(self.game.camera.y)))
+
+                        if random.random() < 0.01 and self.getTile(x,y-1) in self.transparentTiles:
+                            particleArgs = {
+                                "UseVelocity" : True,
+                                "Acceleration" : pygame.Vector2(random.uniform(-8,8),random.uniform(-10,-50)),
+                                "texture" : 6,
+                                "wind" : False,
+                                "randomTex" : True,
+                                "randomTexBounds" : (5,6,6,7,7),
+                                "spread" : (10,0),
+                                "lifespan" : random.randint(25,100)  / self.game.TimeMult 
+                            }
+
+                            self.game.particles.add(pygame.Vector2(x*self.tileSize,y*self.tileSize),"default",count=1,addArgs=particleArgs)
+                    
         

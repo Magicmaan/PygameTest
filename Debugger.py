@@ -31,9 +31,7 @@ class Debugger:
                      self.surface,[0, 
                                    20])
         
-        if int(clock.get_fps()  ) < 60:
-            print("FPS hit 60 at particle count: " + str(len(self.game.particles.particles)))
-    
+        
     
     def addTarget(self,target,debugGroup):
         debugGroup.add(target)
@@ -43,10 +41,9 @@ class Debugger:
     
     
     def draw(self):
-        if gInput.L_CTRL():
+        if gInput.CTRL() and gInput.key("K_f") and self.toggleTimer == 0:
             self.enableDebug = not self.enableDebug
             self.toggleTimer = 20
-
         if self.toggleTimer > 0:
             self.toggleTimer -= 1
 
@@ -81,14 +78,14 @@ class Debugger:
         for obj in debugGroup.sprites():
             posX = obj.position.x
             posY = obj.position.y
-            if obj.position.y < 0:
+            if obj.position.y+self.game.camera.y < 0:
                 posY = 0
-            elif obj.position.y+obj.rect.height > self.game.screen.get_height():
+            elif obj.position.y+obj.rect.height+self.game.camera.y > self.game.screen.get_height():
                 posY = self.game.screen.get_height() - obj.rect.height
 
-            if obj.position.x < 0:
+            if obj.position.x+self.game.camera.x < 0:
                 posX = 0
-            elif obj.position.x+obj.rect.width > self.game.screen.get_width():
+            elif obj.position.x+obj.rect.width + self.game.camera.x > self.game.screen.get_width():
                 posX = self.game.screen.get_width() - 16
 
             #add camera offset
@@ -96,20 +93,20 @@ class Debugger:
             posY += self.game.camera.y
 
             TextGUI.write(obj.identifier + " " + obj.state,
-                         self.surface,[posX  * xMult, 
+                         self.surface,[(posX) * xMult , 
                          (posY + obj.rect.height) * yMult])
             n=0
             l = 4
             TextGUI.write("X:" + str(round(obj.position.x,2)) + " V:" + str(round(obj.velocity.x,2)),
-                         self.surface,[(posX + obj.rect.width)  * xMult, 
+                         self.surface,[(posX + obj.rect.width )  * xMult, 
                          (posY + n*l) * yMult])
             n=n+1
             TextGUI.write("Y:" + str(round(obj.position.y,2)) + " V:" + str(round(obj.velocity.y,2)),
-                         self.surface,[(posX + obj.rect.width)  * xMult, 
+                         self.surface,[(posX + obj.rect.width )  * xMult, 
                          (posY + n*l) * yMult])
             n=n+2
             TextGUI.write("Anim:" + str(obj.AnimationSlides[obj.state][obj.animationPos]),
-                         self.surface,[(posX + obj.rect.width)  * xMult, 
+                         self.surface,[(obj.rect.width + posX ) * xMult , 
                          (posY + n*l) * yMult])
 
             pygame.draw.rect(self.surface, (0,255,0), (obj.rect.left*xMult + (self.game.camera.x * xMult),obj.rect.top*yMult + (self.game.camera.y * xMult),obj.rect.width*xMult,obj.rect.height*yMult), 1)
