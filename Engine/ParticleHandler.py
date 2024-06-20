@@ -1,7 +1,9 @@
 import pygame
 import random
-from TextureHandler import TextureHandler
 import math
+
+from Engine.TextureHandler import TextureHandler
+
 
 Texture = TextureHandler()
 

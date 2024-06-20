@@ -1,5 +1,5 @@
 import pygame
-from Scene import Scene
+from Engine.Scene import Scene
 
 class levelScene(Scene):
     def __init__(self,stage=0):

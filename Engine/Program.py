@@ -1,15 +1,16 @@
 import pygame
-import TextGUI
+import moderngl
+from Engine import TextGUI
 
-from InputHandler import InputHandler
-from SettingsClass import Settings
-from Debugger import Debugger
-from TextureHandler import TextureHandler
-from ParticleHandler import ParticleHandler
+from Engine.InputHandler import InputHandler
+from Engine.SettingsClass import Settings
+from Engine.Debugger import Debugger
+from Engine.TextureHandler import TextureHandler
+from Engine.ParticleHandler import ParticleHandler
 from Particles import *
-from TileMap import TileMap
-from BackgroundHandler import BackgroundHandler
-from GUI import GUIHandler
+from Engine.TileMap import TileMap
+from Engine.BackgroundHandler import BackgroundHandler
+from Engine.GUIHandler import GUIHandler
 
 
 gInput = InputHandler() #initialise input handler
@@ -27,6 +28,7 @@ class Program:
         if self._initialized:
             return
         self._initialized = True
+        
         
         pygame.init() #initialise pygame
         pygame.display.set_caption("Game")
@@ -64,7 +66,7 @@ class Program:
             "Background" : pygame.Surface(self.resolution), #BACKGROUND
             "Foreground" : pygame.Surface(self.resolution), #FOREGROUND
             "Particles" : pygame.Surface(self.resolution), #PARTICLES
-            "GUI" : pygame.Surface(self.resolution), #GUI
+            "GUI" : pygame.Surface(self.resolution,flags=pygame.SRCALPHA), #GUI
         }
         for i,l in self.renderLayers.items():
             l.set_colorkey((0,0,0))
@@ -73,7 +75,9 @@ class Program:
         self.font = TextGUI.initFont()
         self.background = BackgroundHandler(self)
         self.textures = TextureHandler()
+        self.GUI = GUIHandler(self)
         self.tileMap = TileMap(self)
+        
         self.particles = ParticleHandler(self)
         self.particles.add(pygame.Vector2(20,20),"balls")
 
@@ -86,6 +90,8 @@ class Program:
         
         self.allObjects.update()
         self.allSprites.update()
+
+        self.GUI.update(self)
 
         
 
@@ -104,10 +110,12 @@ class Program:
 
         self.tileMap.draw(self.renderLayers["Foreground"])
         self.particles.draw(self.renderLayers["Particles"])
+        self.GUI.draw(self.renderLayers["GUI"])
 
         self.screen.blit(self.renderLayers["Background"],(0,0))
         self.screen.blit(self.renderLayers["Foreground"],(0,0))
         self.screen.blit(self.renderLayers["Particles"],(0,0))
+        self.screen.blit(self.renderLayers["GUI"],(0,0))
 
         TextGUI.writeNew("0123456789 .,/?;:!",self.screen,[-20,20],self.font)
 

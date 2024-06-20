@@ -1,12 +1,13 @@
 import pygame
-import TextGUI
+from Engine import TextGUI
 import random
 
 
 
 class TileMap:
-    def __init__(self,game, tileSize = 16):
+    def __init__(self, game, tileSize = 16, offset = pygame.Vector2(0,0)):
         self.tileSize = tileSize
+        self.offset = offset
         self.tilemap = [
             [1,0],
             [1,0],
@@ -128,7 +129,7 @@ class TileMap:
                     tileImg = False
 
                 if tileImg:
-                    surface.blit(tileImg, ((x*self.tileSize) + int(self.game.camera.x),(y*self.tileSize) + int(self.game.camera.y)))
+                    surface.blit(tileImg, ((x*self.tileSize) + int(self.game.camera.x) + int(self.offset.x),(y*self.tileSize) + int(self.game.camera.y) + int(self.offset.y)))
 
                     #tilemap connect around logic
                     #if in toConnectTiles, will place the connector tiles above,below,left,right

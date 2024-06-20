@@ -1,16 +1,16 @@
 import pygame
 import math
 import random
-from Program import Program
-from TextureHandler import TextureHandler
-from CollisionHandler import *
+from Engine.Program import Program
+from Engine.TextureHandler import TextureHandler
+from Engine.CollisionHandler import *
 from pprint import pprint
 
 game = Program()
 Texture = TextureHandler()
 
 class Entity(pygame.sprite.Sprite):
-    def __init__(self,position,texturePath,attributes):
+    def __init__(self,position,texturePath,texturePos=0,attributes={}):
         pygame.sprite.Sprite.__init__(pygame.sprite.Sprite)
         
         self.position = position
@@ -46,7 +46,7 @@ class Entity(pygame.sprite.Sprite):
         self.texturePath = texturePath
         self.image = Texture.texture(self.texturePath,0)
 
-        self.useOutline = True
+        self.useOutline = False
         self.imageOutline = False
         self.outlineColour = (255,0,255)
 
@@ -86,7 +86,6 @@ class Entity(pygame.sprite.Sprite):
         
         if not self.onGround: #gravity if not on ground
             self.velocity.y += (self.gravity * game.dt) / game.TimeMult
-
         #vertical speed cap
         self.velocity.y = min(self.maxVelocity.y * game.TimeMult, self.velocity.y) 
 
@@ -161,7 +160,7 @@ class Entity(pygame.sprite.Sprite):
         #obj rect doesn't always match sprite
         #must adjust image to be centered inside rect
         correctedPos = pygame.Vector2(self.rect.centerx - self.image.get_width()/2, self.rect.centery - self.image.get_height()/2)
-        correctedPos.y = round(correctedPos.y,0)
+        correctedPos.y = round(correctedPos.y,2)
 
         if self.isAlive:
             if self.useOutline:

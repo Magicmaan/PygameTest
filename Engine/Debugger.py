@@ -1,7 +1,7 @@
 import pygame
-import TextGUI
+from Engine import TextGUI
 from pprint import pprint
-from InputHandler import InputHandler
+from Engine.InputHandler import InputHandler
 
 
 gInput = InputHandler()

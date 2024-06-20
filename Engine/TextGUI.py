@@ -1,6 +1,6 @@
 import pygame
 import os.path
-import TextFont
+from Engine import TextFont
 
 
 if not pygame.font.get_init():

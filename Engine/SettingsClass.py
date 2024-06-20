@@ -1,7 +1,7 @@
 import pygame
 import re
 import os.path
-from InputHandler import InputHandler
+from Engine.InputHandler import InputHandler
 
 
 gameInput = InputHandler()

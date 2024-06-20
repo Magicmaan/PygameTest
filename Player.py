@@ -1,6 +1,6 @@
-from Entity import Entity
-from Program import Program
-from InputHandler import InputHandler
+from Engine.Entity import Entity
+from Engine.Program import Program
+from Engine.InputHandler import InputHandler
 import random
 import numpy
 
@@ -32,38 +32,17 @@ class Player(Entity):
             #"maxVelocity" : pygame.Vector2(100,20)
         }
 
-        Entity.__init__(self,position,texturePath,attributes)
+        Entity.__init__(self,position,texturePath,0,attributes)
 
        
-        self.jumpHeight = -2.5
-        self.jumpCoyote = 10
+        self.jumpHeight = -3
+        self.jumpCoyote = 5 
 
         self.accel = 5
         self.friction = 10
 
 
         
-    def Position(self):
-        return
-        if abs(self.velocity.x) > (self.maxVelocity.x): #max velocity speed cap
-            self.velocity.x = math.copysign(self.maxVelocity.x, self.velocity.x)
-        
-
-        if not self.isMoving: #slow down if not moving
-            self.velocity.x = self.velocity.x * (1-self.friction * game.dt)
-            if math.isclose(self.velocity.x, 0,abs_tol=0.05):
-                self.velocity.x = 0
-        
-        if not self.onGround: #gravity if not on ground
-            self.velocity.y += self.gravity * game.dt
-
-        #vertical speed cap
-        self.velocity.y = min(self.maxVelocity.y, self.velocity.y) 
-
-        
-    
-    
-    
     def update(self):
         self.isMoving = False
         self.state = "idle"
@@ -71,24 +50,22 @@ class Player(Entity):
 
         if gInput.crouch():
             self.friction = 5
-            self.jumpHeight = -3
             self.accel = 1
             self.maxVelocity.update(0.5,5)
             self.state = "crouch"
             #game.particles.add(pygame.Vector2(self.rect.center),"leaf",count=50)
         else:
-            self.jumpHeight = -2.5
             self.friction = 10
             self.accel = 5
             self.maxVelocity.update(1.5,10)
 
-
+        self.jumpHeight = -50
         #if on ground, or x number of frame after being on ground
-        if gInput.jump() and self.velocity.y >= 0 and ((self.onGround or self.onGroundTimer < self.jumpCoyote)):
+        if gInput.jump() and ((self.onGround or self.onGroundTimer < self.jumpCoyote//game.TimeMult)):
             self.onGround = False
-            self.velocity.y = self.jumpHeight
+            self.velocity.y += self.jumpHeight * game.dt
             if gInput.crouch():
-                self.velocity.y *= 1.5
+                self.velocity.y *= 1.1
             self.state = "jump"
             self.input = "jump"
             game.particles.add(pygame.Vector2(self.rect.center),"leaf",count=10)
@@ -122,7 +99,6 @@ class Player(Entity):
         
         
 
-        self.Position() 
 
         self.gfxUpdate()
 

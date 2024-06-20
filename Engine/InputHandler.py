@@ -20,6 +20,7 @@ class InputHandler:
         self.mods = {}
         self.controls = {}
         self.keyTimer = {}
+        self.UserInput = True
 
         
     

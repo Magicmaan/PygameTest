@@ -1,8 +1,7 @@
 import pygame
-from Program import Program
-from Entity import Entity
+from Engine.Program import Program
 from Player import Player
-from Object import Object
+from Engine.Object import Object
 
 
 platform = 14    
@@ -44,11 +43,7 @@ def main():
         game.update()
         game.draw()
         
-        k = pygame.key.get_pressed()
-        if k[pygame.K_ESCAPE]:
-            game.TimeMult = 0.25
-        else:
-            game.TimeMult = 1
+        
 
         game.camera = round(game.camera.smoothstep(pygame.math.Vector2(-player.position.x + game.screen.get_width()/2,game.camera.y),0.15),2)
         game.camera.y = 0
