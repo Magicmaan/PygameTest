@@ -1,11 +1,14 @@
 import pygame
 from Engine import TextGUI
+from Engine.Program import Program
+game = Program()
+
 import random
 
 
 
 class TileMap:
-    def __init__(self, game, tileSize = 16, offset = pygame.Vector2(0,0)):
+    def __init__(self, tileSize = 16, offset = pygame.Vector2(0,0)):
         self.tileSize = tileSize
         self.offset = offset
         self.tilemap = [
@@ -45,7 +48,6 @@ class TileMap:
             (-1, 1),( 0, 1),( 1, 1)
         ]
 
-        self.game = game
 
         self.randomSeed = random.random()
         self.renderview = pygame.Rect(0,0,20,20)
@@ -102,17 +104,19 @@ class TileMap:
         #return list of tiles around rect sprite
         
 
-    def draw(self,surface):
+    def draw(self,surface,viewRect = pygame.Rect(0,0,20,20)):
 
         #limit tilemap render view to within camera x range
-        self.renderview.x = int(-self.game.camera.x // self.tileSize)
-        if self.renderview.x < 0: self.renderview.x = 0
-        self.renderview.width = int((-self.game.camera.x + surface.get_width()) // self.tileSize)+1
+        self.renderview.x = int(-viewRect.x // self.tileSize)
+        if self.renderview.x < 0: 
+            self.renderview.x = 0
+        self.renderview.width = (viewRect.width)
         
         #limit tilemap render view to within camera y range
-        self.renderview.y = int(-self.game.camera.y // self.tileSize)
-        if self.renderview.y < 0: self.renderview.y = 0
-        self.renderview.height = int((-self.game.camera.y + surface.get_height()) // self.tileSize)+1
+        self.renderview.y = int(-viewRect.y // self.tileSize)
+        if self.renderview.y < 0: 
+            self.renderview.y = 0
+        self.renderview.height = (viewRect.height)
 
         #print(str(self.renderview.x) + " " + str(self.renderview.width) + "  " + str(self.renderview.y) + " " + str(self.renderview.height))
         for y in range(self.renderview.y,self.renderview.height):
@@ -129,19 +133,19 @@ class TileMap:
                     tileImg = False
 
                 if tileImg:
-                    surface.blit(tileImg, ((x*self.tileSize) + int(self.game.camera.x) + int(self.offset.x),(y*self.tileSize) + int(self.game.camera.y) + int(self.offset.y)))
+                    surface.blit(tileImg, ((x*self.tileSize) + int(game.camera.x) + int(self.offset.x),(y*self.tileSize) + int(game.camera.y) + int(self.offset.y)))
 
                     #tilemap connect around logic
                     #if in toConnectTiles, will place the connector tiles above,below,left,right
                     if self.tilemap[y][x] in self.toConnectTiles:
                         if self.getTile(x,y-1) in self.transparentTiles:
-                            surface.blit(self.texturemap[self.toConnectTiles[self.tilemap[y][x]][0]], ((x*self.tileSize) + int(self.game.camera.x),((y-1)*self.tileSize) + int(self.game.camera.y)))
+                            surface.blit(self.texturemap[self.toConnectTiles[self.tilemap[y][x]][0]], ((x*self.tileSize) + int(game.camera.x),((y-1)*self.tileSize) + int(game.camera.y)))
                         if self.getTile(x,y+1) in self.transparentTiles:
-                            surface.blit(self.texturemap[self.toConnectTiles[self.tilemap[y][x]][1]], ((x+1*self.tileSize) + int(self.game.camera.x),((y)*self.tileSize) + int(self.game.camera.y)))
+                            surface.blit(self.texturemap[self.toConnectTiles[self.tilemap[y][x]][1]], ((x+1*self.tileSize) + int(game.camera.x),((y)*self.tileSize) + int(game.camera.y)))
                         if self.getTile(x+1,y) in self.transparentTiles:
-                            surface.blit(self.texturemap[self.toConnectTiles[self.tilemap[y][x]][3]], ((x+1*self.tileSize) + int(self.game.camera.x),((y)*self.tileSize) + int(self.game.camera.y)))
+                            surface.blit(self.texturemap[self.toConnectTiles[self.tilemap[y][x]][3]], ((x+1*self.tileSize) + int(game.camera.x),((y)*self.tileSize) + int(game.camera.y)))
                         if self.getTile(x-1,y) in self.transparentTiles:
-                            surface.blit(self.texturemap[self.toConnectTiles[self.tilemap[y][x]][2]], ((x-1*self.tileSize) + int(self.game.camera.x),((y)*self.tileSize) + int(self.game.camera.y)))
+                            surface.blit(self.texturemap[self.toConnectTiles[self.tilemap[y][x]][2]], ((x-1*self.tileSize) + int(game.camera.x),((y)*self.tileSize) + int(game.camera.y)))
 
                         if random.random() < 0.01 and self.getTile(x,y-1) in self.transparentTiles:
                             particleArgs = {
@@ -152,9 +156,9 @@ class TileMap:
                                 "randomTex" : True,
                                 "randomTexBounds" : (5,6,6,7,7),
                                 "spread" : (10,0),
-                                "lifespan" : random.randint(25,100)  / self.game.TimeMult 
+                                "lifespan" : random.randint(25,100)  / game.TimeMult 
                             }
 
-                            self.game.particles.add(pygame.Vector2(x*self.tileSize,y*self.tileSize),"default",count=1,addArgs=particleArgs)
+                            game.particles.add(pygame.Vector2(x*self.tileSize,y*self.tileSize),"default",count=1,addArgs=particleArgs)
                     
         

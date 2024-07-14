@@ -3,7 +3,6 @@ import pygame
 from Engine.SettingsClass import Settings
 from Engine.Debugger import Debugger
 from Engine.InputHandler import InputHandler
-from Engine.TileMap import TileMap
 gInput = InputHandler() #initialise input handler
 
 

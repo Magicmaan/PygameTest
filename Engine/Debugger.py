@@ -23,11 +23,11 @@ class Debugger:
         self.identifier = "debugger"
     
     def printFPS(self,clock):
-        TextGUI.write(str(round(clock.get_fps(),1)),
+        TextGUI.writeD(str(round(clock.get_fps(),1)),
                      self.surface,[0, 
                                    0])
         
-        TextGUI.write(str(len(self.game.particles.particles)),
+        TextGUI.writeD(str(len(self.game.particles.particles)),
                      self.surface,[0, 
                                    20])
         
@@ -92,20 +92,20 @@ class Debugger:
             posX += self.game.camera.x
             posY += self.game.camera.y
 
-            TextGUI.write(obj.identifier + " " + obj.state,
+            TextGUI.writeD(obj.identifier + " " + obj.state,
                          self.surface,[(posX) * xMult , 
                          (posY + obj.rect.height) * yMult])
             n=0
             l = 4
-            TextGUI.write("X:" + str(round(obj.position.x,2)) + " V:" + str(round(obj.velocity.x,2)),
+            TextGUI.writeD("X:" + str(round(obj.position.x,2)) + " V:" + str(round(obj.velocity.x,2)),
                          self.surface,[(posX + obj.rect.width )  * xMult, 
                          (posY + n*l) * yMult])
             n=n+1
-            TextGUI.write("Y:" + str(round(obj.position.y,2)) + " V:" + str(round(obj.velocity.y,2)),
+            TextGUI.writeD("Y:" + str(round(obj.position.y,2)) + " V:" + str(round(obj.velocity.y,2)),
                          self.surface,[(posX + obj.rect.width )  * xMult, 
                          (posY + n*l) * yMult])
             n=n+2
-            TextGUI.write("Anim:" + str(obj.AnimationSlides[obj.state][obj.animationPos]),
+            TextGUI.writeD("Anim:" + str(obj.AnimationSlides[obj.state][obj.animationPos]),
                          self.surface,[(obj.rect.width + posX ) * xMult , 
                          (posY + n*l) * yMult])
 

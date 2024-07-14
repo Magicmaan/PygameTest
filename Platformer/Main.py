@@ -1,15 +1,16 @@
+import __init__
 import pygame
-from Engine.Program import Program
+from Engine import Program
 from Player import Player
-from Engine.Object import Object
-
+from Engine import Object
+from Engine.TileMap import TileMap
 
 platform = 14    
 
 def main():
-    
     game = Program()
-    
+    game.setMap(TileMap())
+    pygame.display.set_caption('Platformer')
     
     
     player = Player(pygame.math.Vector2(50,20))   
@@ -45,7 +46,7 @@ def main():
         
         
 
-        game.camera = round(game.camera.smoothstep(pygame.math.Vector2(-player.position.x + game.screen.get_width()/2,game.camera.y),0.15),2)
+        game.camera = game.camera.smoothstep( pygame.math.Vector2(-player.position.x + game.screen.get_width()/2,game.camera.y) ,0.15)
         game.camera.y = 0
         game.dt = (game.clock.tick(game.framerate) / 1000) * game.TimeMult  
 

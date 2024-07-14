@@ -54,7 +54,7 @@ class TextureHandler:
 
         SprRow = sprsheet.get_width() / sprSize.x
         topX = (pos % SprRow) * sprSize.x
-        topY = (pos // SprRow) * sprSize.x
+        topY = (pos // SprRow) * sprSize.y
 
 
         rect = pygame.Rect(topX,topY,sprSize.x,sprSize.y)

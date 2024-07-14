@@ -7,8 +7,6 @@ from Engine.SettingsClass import Settings
 from Engine.Debugger import Debugger
 from Engine.TextureHandler import TextureHandler
 from Engine.ParticleHandler import ParticleHandler
-from Particles import *
-from Engine.TileMap import TileMap
 from Engine.BackgroundHandler import BackgroundHandler
 from Engine.GUIHandler import GUIHandler
 
@@ -70,13 +68,13 @@ class Program:
         }
         for i,l in self.renderLayers.items():
             l.set_colorkey((0,0,0))
-    
-        
+
+
+        self.textures = TextureHandler()
         self.font = TextGUI.initFont()
         self.background = BackgroundHandler(self)
-        self.textures = TextureHandler()
         self.GUI = GUIHandler(self)
-        self.tileMap = TileMap(self)
+        
         
         self.particles = ParticleHandler(self)
         self.particles.add(pygame.Vector2(20,20),"balls")
@@ -93,41 +91,50 @@ class Program:
 
         self.GUI.update(self)
 
-        
-
-        
-        
     def draw(self):
         self.screen.fill("gray")
-
-
         for i,layer in self.renderLayers.items():
             layer.fill((0,0,0))
         
 
         self.background.draw(self.renderLayers["Background"])
+
+        #draw all Sprites to Foreground
         self.drawGroup(self.allSprites,self.renderLayers["Foreground"])
 
-        self.tileMap.draw(self.renderLayers["Foreground"])
+
+        self.tileMap.draw(self.renderLayers["Foreground"],pygame.Rect(self.camera.x,self.camera.y,20,20))
         self.particles.draw(self.renderLayers["Particles"])
         self.GUI.draw(self.renderLayers["GUI"])
 
+
+        #Draw the layers in order
         self.screen.blit(self.renderLayers["Background"],(0,0))
         self.screen.blit(self.renderLayers["Foreground"],(0,0))
         self.screen.blit(self.renderLayers["Particles"],(0,0))
         self.screen.blit(self.renderLayers["GUI"],(0,0))
 
-        TextGUI.writeNew("0123456789 .,/?;:!",self.screen,[-20,20],self.font)
+        TextGUI.write("ABCDEFGHIJKLMMMMMMMMMMMMMMMMMMMMM",self.screen,[0,20],self.font)
+        TextGUI.write("abcdefghijklmnopqrstuvwxyz",self.screen,[0,27],self.font)
+        TextGUI.write("1234567890",self.screen,[0,34],self.font)
+        TextGUI.write("?!.,:;()/",self.screen,[0,41],self.font)
+        TextGUI.write("Hello There! My Name is Theo-<>12980:ze*5",self.screen,[0,48],self.font)
 
         frame = pygame.transform.scale(self.screen, self.Outputresolution) #output to frame and draw to screen
         self.screenOutput.blit(frame, frame.get_rect())
-        
         self.debugger.draw()
         
         
         pygame.display.flip()   
         
+    def setMap(self,tileMap):
+        self.tileMap = tileMap
+
     
+
+
+
+
     def stop(self):
         self.running = False
 
@@ -140,7 +147,6 @@ class Program:
         pygame.display.quit()
         pygame.font.quit()
         pygame.quit()
-
 
     def drawGroup(self,group,surface):
         for spr in group.sprites():

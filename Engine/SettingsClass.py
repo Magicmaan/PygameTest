@@ -2,8 +2,6 @@ import pygame
 import re
 import os.path
 from Engine.InputHandler import InputHandler
-
-
 gameInput = InputHandler()
 
 
@@ -17,9 +15,7 @@ def toInt(var):
 
 
 class Settings:
-    def __init__(self):
-        print("Settings Initialisation")
-        filepath = ('Settings.txt')
+    def __init__(self,filepath='Engine/Settings.txt'):
         self.settings = {}
         
         if not os.path.isfile(filepath):
