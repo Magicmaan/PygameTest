@@ -1,11 +1,12 @@
 import turtle
 import math
 
+global tturtle 
 tturtle = turtle.Turtle()  # recursive turtle
 tturtle.screen.title("L-System Derivation")
 tturtle.speed(0)  # adjust as needed (0 = fastest)
-turtle_screen = turtle.Screen()  # create graphics window
-turtle_screen.screensize(1500, 1500)
+#turtle_screen = turtle.Screen()  # create graphics window
+#turtle_screen.screensize(1500, 1500)
 tturtle.hideturtle()
 
 
@@ -38,6 +39,7 @@ def function_setPosRot(turtle,position,angle=False):
         turtle.setheading(angle)
 
 
+
 #Base instruction set bindings for functions of turtle
 commandList = {
     "F" :           function_Fwd,           #Move Forward and draw
@@ -54,7 +56,7 @@ commandList = {
 #defines shorthand for commands
 #loops can be formed with [ ] which allow to branch off and then return
 rules = {
-    "G" : "FFFF[+ffffFFF]FFFF+"
+    "G" : "FFFF[+fffFFFF]FFFF+"
 }
 
 
@@ -74,6 +76,14 @@ class LSys():
 
         #draw it
         self._drawBasic(0)
+    def function_enterLoop(self):
+        self.position = self.turtle.position()
+        self.heading = self.turtle.heading()
+
+    def function_exitLoop(self):
+        self.turtle.pu()
+        self.turtle.setpos(self.position)
+        self.turtle.setheading(self.heading)
 
     def _decompressAxiom(self):
         #Decompress a rule shorthand into instructionset for turtle / draw
@@ -95,28 +105,24 @@ class LSys():
 
     
     def _drawBasic(self,string):
-        inloop = True
         stack = []
         #for command in the turtles instructions
         for cmd in self.instructions:
-            turtle.pd()
+            self.turtle.pd()
             print(cmd)
+            if cmd in commandList:
+                func = commandList[cmd]
+                print(func.__name__)
+                output = func(self.turtle,self.settings)
+            
+            if cmd == "[":
+                self.function_enterLoop()
+            if cmd == "]":
+                print("CLOSE LOOP " + str(len(stack)))
+                self.function_exitLoop()
 
-            if cmd in commandList.keys():
-                commandList[cmd](self.turtle,self.settings)
-            else:
-                print(cmd + " Not Found -------------------")
-                if cmd == "[":
-                    # Save the current state
-                    stack.append((turtle.position(), turtle.heading()))
-                if cmd == "]":
-                    # Restore the last saved state
-                    turtle.pu()  # pen up - not drawing
-                    position, heading = stack.pop()
-                    turtle.goto(position)
-                    turtle.setheading(heading)
-                '''elif False:
-                    elif cmd == "F":
+                print(str(self.position) + " " + str(self.heading))
+                '''elif cmd == "F":
                         turtle.forward(self.settings["seg_length"])
                     elif cmd == "+":
                         turtle.right(self.settings["angle"])
@@ -152,4 +158,4 @@ test = LSys(tturtle,"G",0)
 
 #test._drawBasic("--FF+FF+F-FF!!FFFF!!FFFF---FFFFFFfffFFFFF")
 
-turtle_screen.exitonclick()
+tturtle.getscreen().exitonclick()
