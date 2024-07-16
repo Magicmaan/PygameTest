@@ -49,14 +49,13 @@ commandList = {
     "!" :           function_widthIncrease, #Decrease branch Width
     "@" :           function_widthDecrease, #Increase branch Width
     "%" :           function_flower,        #flower / bud
-    "£" :           function_setPosRot,
 }
 
 #Rule Set
 #defines shorthand for commands
 #loops can be formed with [ ] which allow to branch off and then return
 rules = {
-    "G" : "FFFF[+fffFFFF]FFFF+"
+    "G" : "FFFF[+fff[++FF]FFFF]FFFF+"
 }
 
 
@@ -66,9 +65,9 @@ class LSys():
 
         self.settings = {
             "seg_length" : 10,
-            "angle" : 90,
+            "angle" : 45,
             "widthStep" : 1,
-            "depth" : 1 ,
+            "depth" : 8 ,
             "axiom" : axiom
         }
         #decompress input axiom to instructions
@@ -77,13 +76,13 @@ class LSys():
         #draw it
         self._drawBasic(0)
     def function_enterLoop(self):
-        self.position = self.turtle.position()
-        self.heading = self.turtle.heading()
+        self.stack.append([self.turtle.position(),self.turtle.heading()])
 
     def function_exitLoop(self):
+        position, heading = self.stack.pop()
         self.turtle.pu()
-        self.turtle.setpos(self.position)
-        self.turtle.setheading(self.heading)
+        self.turtle.setpos(position)
+        self.turtle.setheading(heading)
 
     def _decompressAxiom(self):
         #Decompress a rule shorthand into instructionset for turtle / draw
@@ -105,7 +104,7 @@ class LSys():
 
     
     def _drawBasic(self,string):
-        stack = []
+        self.stack = []
         #for command in the turtles instructions
         for cmd in self.instructions:
             self.turtle.pd()
@@ -118,10 +117,8 @@ class LSys():
             if cmd == "[":
                 self.function_enterLoop()
             if cmd == "]":
-                print("CLOSE LOOP " + str(len(stack)))
+                print("CLOSE LOOP ")
                 self.function_exitLoop()
-
-                print(str(self.position) + " " + str(self.heading))
                 '''elif cmd == "F":
                         turtle.forward(self.settings["seg_length"])
                     elif cmd == "+":
