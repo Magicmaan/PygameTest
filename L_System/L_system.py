@@ -10,40 +10,37 @@ tturtle.speed(0)  # adjust as needed (0 = fastest)
 tturtle.hideturtle()
 
 
-def function_Fwd(turtle,settings):
-    turtle.forward(settings["seg_length"])
+def function_fwd(turtle,step):
+    turtle.forward(step)
 
-def function_FwdNodraw(turtle,settings):
+def function_fwdNodraw(turtle,step):
     turtle.penup()  # pen up - not drawing
-    turtle.forward(settings["seg_length"])
+    turtle.forward(step)
 
-def function_rotRight(turtle,settings):
-    turtle.right(settings["angle"])
+def function_rotRight(turtle,angleStep):
+    turtle.right(angleStep)
 
-def function_rotLeft(turtle,settings):
-    turtle.left(settings["angle"])
+def function_rotLeft(turtle,angleStep):
+    turtle.left(angleStep)
 
-def function_widthIncrease(turtle,settings):
+def function_widthIncrease(turtle,widthStep):
     currentWidth = turtle.pensize()
-    turtle.pensize(currentWidth + settings["widthStep"])
+    turtle.pensize(currentWidth + widthStep)
 
-def function_widthDecrease(turtle,settings):
+def function_widthDecrease(turtle,widthStep):
     currentWidth = turtle.pensize()
-    turtle.pensize(min(0,currentWidth - settings["widthStep"]))
+    turtle.pensize(currentWidth - widthStep)
+
 def function_flower():
     pass
-def function_setPosRot(turtle,position,angle=False):
-    turtle.pu()
-    turtle.goto(position)
-    if angle:
-        turtle.setheading(angle)
+
 
 
 
 #Base instruction set bindings for functions of turtle
 commandList = {
-    "F" :           function_Fwd,           #Move Forward and draw
-    "f" :           function_FwdNodraw,     #Move and don't draw
+    "F" :           function_fwd,           #Move Forward and draw
+    "f" :           function_fwdNodraw,     #Move and don't draw
     "+" :           function_rotRight,      #Rotate Right
     "-" :           function_rotLeft,       #Rotate Left
     "!" :           function_widthIncrease, #Decrease branch Width
@@ -55,7 +52,7 @@ commandList = {
 #defines shorthand for commands
 #loops can be formed with [ ] which allow to branch off and then return
 rules = {
-    "G" : "FFFF[+fff[++FF]FFFF]FFFF+"
+    "G" : "-FFFF[+!FFF[++FF]FFFF@]FFFFFFF--FFFF[+!FFF[++FF]FFFF@]FFFFFFF"
 }
 
 
@@ -67,22 +64,69 @@ class LSys():
             "seg_length" : 10,
             "angle" : 45,
             "widthStep" : 1,
-            "depth" : 8 ,
+            "depth" : 10 ,
             "axiom" : axiom
         }
         #decompress input axiom to instructions
         self.instructions = "".join(self._decompressAxiom())
+        self.vars = {}
+        self.expressionCache = {}
 
         #draw it
         self._drawBasic(0)
-    def function_enterLoop(self):
+    
+
+    def _drawBasic(self,string):
+        self.stack = []
+        #for command in the turtles instructions
+        for cmd in self.instructions:
+            self.turtle.pd()
+            if cmd in commandList:
+                func = commandList[cmd]
+
+                #if next "cmd" is (, then regex and eval expression (or store)
+                #create cache   
+                #expression = 
+                #param = self._evalExpression(expression)
+
+                if "fwd" in func.__name__:
+                     param = self.settings["seg_length"]
+                elif "rot" in func.__name__:
+                     param = self.settings["angle"]
+                elif "width" in func.__name__:
+                    param = self.settings["widthStep"]
+
+                output = func(self.turtle,param)
+            
+            if cmd == "[":
+                self._function_enterLoop()
+            if cmd == "]":
+                print("CLOSE LOOP ")
+                self._function_exitLoop()
+
+
+    #Internal functions -----------------------------------------------------------------------------------------
+
+    def _function_enterLoop(self):
         self.stack.append([self.turtle.position(),self.turtle.heading()])
 
-    def function_exitLoop(self):
+    def _function_exitLoop(self):
         position, heading = self.stack.pop()
         self.turtle.pu()
         self.turtle.setpos(position)
         self.turtle.setheading(heading)
+
+    def _evalExpression(self,expression):
+        if not expression in self.expressionCache:
+            self.expressionCache[expression] = eval(expression)
+        
+        result = self.expressionCache[expression]
+        return result
+    
+    def _decompressExpression(self,expression):
+        #extractedString = regex that shit
+
+        return
 
     def _decompressAxiom(self):
         #Decompress a rule shorthand into instructionset for turtle / draw
@@ -93,56 +137,23 @@ class LSys():
         for loop in range(self.settings["depth"]):
             #get last Axiom
             #find corresponding instructionset for the Rule and unpack
-            nextSequence = self._decompressRule(nextAxiom)
-            instructions += nextSequence
+            nextRule = self._decompressRule(nextAxiom)
+            instructions += nextRule
         
         return instructions
     
     def _decompressRule(self,rule):
         #if its a rule, return the rules instruction
+
+        #i.e. input rule = F
+        #in rules look for dict entry F, return val
+
+        #if none is found, rules.get will return the input rule
         return rules.get(rule)
 
     
-    def _drawBasic(self,string):
-        self.stack = []
-        #for command in the turtles instructions
-        for cmd in self.instructions:
-            self.turtle.pd()
-            print(cmd)
-            if cmd in commandList:
-                func = commandList[cmd]
-                print(func.__name__)
-                output = func(self.turtle,self.settings)
-            
-            if cmd == "[":
-                self.function_enterLoop()
-            if cmd == "]":
-                print("CLOSE LOOP ")
-                self.function_exitLoop()
-                '''elif cmd == "F":
-                        turtle.forward(self.settings["seg_length"])
-                    elif cmd == "+":
-                        turtle.right(self.settings["angle"])
-                    elif cmd == "-":
-                        turtle.left(self.settings["angle"])    '''    
-            '''
-            #start a closed loop
-            # 1,2, [4,3,2,1], 3,4
-            if cmd == "[":
-                stack.append((turtle.position(), turtle.heading()))
-            elif cmd == "]":
-                turtle.pu()  # pen up - not drawing
-                position, heading = stack.pop()
-                turtle.goto(position)
-                turtle.setheading(heading)
-                
+    
 
-            #if corresponding command in instructionset, do its function
-            #F = function_Fwd etc
-            if cmd in commandList.keys():
-                commandList[cmd](self.turtle,self.settings)
-            else:
-                print("COMMAND: " + cmd + " invalid ----------")'''
 
 
 
