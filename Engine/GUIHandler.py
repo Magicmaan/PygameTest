@@ -9,12 +9,11 @@ gInput = InputHandler() #initialise input handler
 widgets = {
     "Text" : {},
     "Button" : {},
-    ""
 }
 
 
 class GUIWidget:
-    def __init__(self,namespace,rect,widget=="button",WidgetSettings={}) -> None:
+    def __init__(self,namespace,rect,widget="button",WidgetSettings={}):
         pass
 
     def update(self,game):
@@ -86,7 +85,8 @@ class GUI:
         self.active
 
     def addElem(self,element,x,y):
-    
+        self.elements.append(element)
+        pass
     def removeElem(self,namespace):
         #take in element namespace to remove
         pass

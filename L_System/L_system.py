@@ -52,7 +52,8 @@ commandList = {
 #defines shorthand for commands
 #loops can be formed with [ ] which allow to branch off and then return
 rules = {
-    "G" : "-FFFF[+!FFF[++FF]FFFF@]FFFFFFF--FFFF[+!FFF[++FF]FFFF@]FFFFFFF"
+    "G" : "F[+L]-L",
+    "L" : "F+FF"
 }
 
 
@@ -62,7 +63,7 @@ class LSys():
 
         self.settings = {
             "seg_length" : 10,
-            "angle" : 45,
+            "angle" : 30,
             "widthStep" : 1,
             "depth" : 10 ,
             "axiom" : axiom
@@ -108,13 +109,14 @@ class LSys():
     #Internal functions -----------------------------------------------------------------------------------------
 
     def _function_enterLoop(self):
-        self.stack.append([self.turtle.position(),self.turtle.heading()])
+        self.stack.append([self.turtle.position(),self.turtle.heading(),self.turtle.pensize()])
 
     def _function_exitLoop(self):
-        position, heading = self.stack.pop()
+        position, heading, pen = self.stack.pop()
         self.turtle.pu()
         self.turtle.setpos(position)
         self.turtle.setheading(heading)
+        self.turtle.pensize(pen)
 
     def _evalExpression(self,expression):
         if not expression in self.expressionCache:
