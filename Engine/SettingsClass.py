@@ -1,8 +1,6 @@
 import pygame
 import re
 import os.path
-from Engine.InputHandler import InputHandler
-gameInput = InputHandler()
 
 
 def toInt(var):
@@ -13,23 +11,20 @@ def toInt(var):
         return var
 
 
-
 class Settings:
-    def __init__(self,filepath='Engine/Settings.txt'):
+    def __init__(self, game, filepath="Engine/Settings.txt"):
         self.settings = {}
-        
+        self.game = game
         if not os.path.isfile(filepath):
-            file = open(filepath,"w")
+            file = open(filepath, "w")
         else:
-            file = open(filepath,"r")
-        
-        
-        
+            file = open(filepath, "r")
+
         category = ""
         for line in file:
-            line = line.replace('\n','')
+            line = line.replace("\n", "")
             if line == "[General]":
-                
+
                 category = "general"
                 print(category + " Settings")
                 continue
@@ -37,28 +32,20 @@ class Settings:
                 category = "keybinds"
                 print(category + " Settings")
                 continue
-            
-            
-            
-            parts = re.split(r'[= ]+', line)
+
+            parts = re.split(r"[= ]+", line)
             if len(parts) != 2:
                 continue
-            
+
             if category == "general":
                 settingsName = parts[0]
                 settingsValue = parts[1]
-                setattr(self,settingsName,toInt(settingsValue))
-                    
+                setattr(self, settingsName, toInt(settingsValue))
+
             if category == "keybinds":
                 keyLink = parts[0]
                 keyName = parts[1]
                 print(parts)
-                gameInput.newControl(keyLink,keyName)
-        
-            
+                self.game.input.newControl(keyLink, keyName)
 
-            
-            
         file.close()
-        
-        

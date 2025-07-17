@@ -1,4 +1,5 @@
 import pygame
+from pathlib import Path
 
 
 class BackgroundHandler:
@@ -6,9 +7,9 @@ class BackgroundHandler:
         self.game = game
 
         defaultBG = [
-            pygame.image.load("resources/background0.png").convert(),
-            pygame.image.load("resources/background1.png").convert(),
-            pygame.image.load("resources/background2.png").convert(),
+            pygame.image.load(Path.cwd() / "Resources" / "background0.png").convert(),
+            pygame.image.load(Path.cwd() / "Resources" / "background1.png").convert(),
+            pygame.image.load(Path.cwd() / "Resources" / "background2.png").convert(),
         ]
         defaultBG[0].set_colorkey((0,0,0))
         defaultBG[1].set_colorkey((0,0,0))

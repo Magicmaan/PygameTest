@@ -8,3 +8,17 @@ __pycache__/
 */__pycache__/
 **/__pycache__/
 **/*/__pycache__/
+Engine/__pycache__/__init__.cpython-311.pyc
+Engine/__pycache__/BackgroundHandler.cpython-311.pyc
+Engine/__pycache__/CollisionHandler.cpython-311.pyc
+Engine/__pycache__/Debugger.cpython-311.pyc
+Engine/__pycache__/Entity.cpython-311.pyc
+Engine/__pycache__/GUIHandler.cpython-311.pyc
+Engine/__pycache__/InputHandler.cpython-311.pyc
+Engine/__pycache__/Object.cpython-311.pyc
+Engine/__pycache__/ParticleHandler.cpython-311.pyc
+Engine/__pycache__/Program.cpython-311.pyc
+Engine/__pycache__/SettingsClass.cpython-311.pyc
+Engine/__pycache__/TextGUI.cpython-311.pyc
+Engine/__pycache__/TextureHandler.cpython-311.pyc
+Engine/__pycache__/TileMap.cpython-311.pyc
