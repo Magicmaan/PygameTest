@@ -1,4 +1,10 @@
 
 __pycache__/
 .venv
-*/**/__pycache__
+**/__pycache__
+*/__/__pycache__
+**/*/__pycache__
+__pycache__/
+*/__pycache__/
+**/__pycache__/
+**/*/__pycache__/
